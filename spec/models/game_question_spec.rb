@@ -32,6 +32,19 @@ RSpec.describe GameQuestion, type: :model do
     it 'correct .correct_answer_key' do
       expect(game_question.correct_answer_key).to eq('b')
     end
+
+    it 'correct .help_hash' do
+      expect(game_question.help_hash).to eq({})
+
+      game_question.help_hash[:some_key1] = 'blabla1'
+      game_question.help_hash['some_key2'] = 'blabla2'
+
+      expect(game_question.save).to be_truthy
+
+      gq = GameQuestion.find(game_question.id)
+
+      expect(gq.help_hash).to eq(some_key1: 'blabla1', 'some_key2' => 'blabla2')
+    end
   end
 
   # help_hash у нас имеет такой формат:
