@@ -12,7 +12,7 @@ require 'support/my_spec_helper'
 # ключевая логика игры и значит работы сайта.
 RSpec.describe Game, type: :model do
   # Пользователь для создания игр
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) {FactoryGirl.create(:user)}
 
   # Игра с прописанными игровыми вопросами
   let(:game_w_questions) do
@@ -127,6 +127,47 @@ RSpec.describe Game, type: :model do
   context 'previous game question' do
     it 'returns previous level' do
       expect(game_w_questions.previous_level).to eq(-1)
+    end
+  end
+
+  context 'answer current question' do
+    context 'timeout' do
+      it 'returns false' do
+        game_w_questions.created_at = 1.hour.ago
+
+        expect(game_w_questions.answer_current_question!('d')).to be false
+        expect(game_w_questions.finished?).to be true
+        expect(game_w_questions.status).to eq(:timeout)
+      end
+    end
+
+    context 'when answer is wrong' do
+      it 'returns false' do
+        expect(game_w_questions.answer_current_question!('a')).to be false
+        expect(game_w_questions.finished?).to be true
+        expect(game_w_questions.status).to eq(:fail)
+      end
+    end
+
+    context 'when answer is right' do
+      context 'not last question' do
+        it 'returns true and continues the game' do
+          expect(game_w_questions.answer_current_question!('d')).to be true
+          expect(game_w_questions.current_level).to eq(1)
+          expect(game_w_questions.status).to eq(:in_progress)
+        end
+      end
+
+      context 'last question' do
+        it 'returns true and wins the game' do
+          game_w_questions.current_level = Question::QUESTION_LEVELS.max
+
+          expect(game_w_questions.answer_current_question!('d')).to be true
+          expect(game_w_questions.finished?).to be true
+          expect(game_w_questions.status).to eq(:won)
+          expect(game_w_questions.prize).to eq(Game::PRIZES.last)
+        end
+      end
     end
   end
 end
