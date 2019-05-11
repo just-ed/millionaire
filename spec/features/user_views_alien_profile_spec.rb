@@ -8,7 +8,6 @@ RSpec.feature 'User views alien profile', type: :feature do
     [
       FactoryGirl.create(
         :game,
-        id: 1,
         user: another_user,
         prize: 8_000,
         current_level: 7,
@@ -18,7 +17,6 @@ RSpec.feature 'User views alien profile', type: :feature do
       ),
       FactoryGirl.create(
         :game,
-        id: 2,
         user: another_user,
         prize: 1_000,
         current_level: 8,
@@ -29,9 +27,7 @@ RSpec.feature 'User views alien profile', type: :feature do
     ]
   end
 
-  before(:each) do
-    login_as user
-  end
+  before(:each) { login_as user }
 
   scenario 'successfully' do
     visit '/'
@@ -40,19 +36,25 @@ RSpec.feature 'User views alien profile', type: :feature do
 
     expect(page).to have_current_path "/users/#{another_user.id}"
 
-    expect(page).to have_content'Миша'
-    expect(page).not_to have_content'Сменить имя и пароль'
+    expect(page).to have_content 'Миша'
+    expect(page).not_to have_content 'Сменить имя и пароль'
 
-    expect(page).to have_content'1' # номер игры
-    expect(page).to have_content'деньги' # статус
-    expect(page).to have_content'05 марта, 12:00' # дата
-    expect(page).to have_content'7' # уровень вопроса
-    expect(page).to have_content'8 000 ₽' # выигрыш
+    expect(page).to have_selector"#game-#{games.first.id}"
 
-    expect(page).to have_content'2' # номер игры
-    expect(page).to have_content'проигрыш' # статус
-    expect(page).to have_content'05 марта, 12:30' # дата
-    expect(page).to have_content'8' # уровень вопроса
-    expect(page).to have_content'1 000 ₽' # выигрыш
+    within "#game-#{games.first.id}" do
+      expect(page).to have_content'деньги'
+      expect(page).to have_content'05 марта, 12:00'
+      expect(page).to have_content'7'
+      expect(page).to have_content'8 000 ₽'
+    end
+
+    expect(page).to have_selector"#game-#{games[1].id}"
+
+    within "#game-#{games[1].id}" do
+      expect(page).to have_content 'проигрыш'
+      expect(page).to have_content '05 марта, 12:30'
+      expect(page).to have_content '8'
+      expect(page).to have_content '1 000 ₽'
+    end
   end
 end
