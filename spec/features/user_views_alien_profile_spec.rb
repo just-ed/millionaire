@@ -39,16 +39,16 @@ RSpec.feature 'User views alien profile', type: :feature do
     expect(page).to have_content 'Миша'
     expect(page).not_to have_content 'Сменить имя и пароль'
 
-    expect(page).to have_selector"#game-#{games.first.id}"
+    expect(page).to have_selector "#game-#{games.first.id}"
 
     within "#game-#{games.first.id}" do
-      expect(page).to have_content'деньги'
-      expect(page).to have_content'05 марта, 12:00'
-      expect(page).to have_content'7'
-      expect(page).to have_content'8 000 ₽'
+      expect(page).to have_content 'деньги'
+      expect(page).to have_content '05 марта, 12:00'
+      expect(page).to have_content '7'
+      expect(page).to have_content '8 000 ₽'
     end
 
-    expect(page).to have_selector"#game-#{games[1].id}"
+    expect(page).to have_selector "#game-#{games[1].id}"
 
     within "#game-#{games[1].id}" do
       expect(page).to have_content 'проигрыш'
